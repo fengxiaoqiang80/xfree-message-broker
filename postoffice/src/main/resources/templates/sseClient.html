@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <title>Reactive Programming with Spring 5</title>
+</head>
+<body>
+<div>
+    <ul id="events"></ul>
+</div>
+<script type="application/javascript">
+    function addMessage(message) {
+        var el = document.createElement("li");
+        el.innerHTML = message;
+        document.getElementById("events").appendChild(el);
+    }
+
+    if (!!window.EventSource) {
+        var eventSource = new EventSource("/message/broker/collect/mytoken/-1");
+        var eventSource = new EventSource("/message/broker/collect/mytoken/-1");
+
+        eventSource.addEventListener("ChartMsg",function (event) {
+            //var temperature = JSON.parse(event.data);
+            addMessage('ChartMsg: ' + event.data + " C");
+        },false);
+
+        window.onbeforeunload = function(){
+            eventSource.close();
+        };
+
+        eventSource.onopen = function (event) {
+            addMessage('Connection opened');
+        };
+
+
+        eventSource.onerror = function (e) {
+            if (e.readyState === EventSource.CONNECTING) {
+                addMessage('Connecting to server(e)');
+            } else if (e.readyState === EventSource.OPEN) {
+                addMessage('Connection opened(e)');
+            } else if (e.readyState === EventSource.CLOSING) {
+                addMessage('Connection closing(e)');
+            } else if (e.readyState === EventSource.CLOSED) {
+                addMessage('Connection closed(e)');
+            }
+        };
+    } else {
+        addMessage('Your browser does not support Server-Sent Events!');
+    }
+</script>
+</body>
+</html>
