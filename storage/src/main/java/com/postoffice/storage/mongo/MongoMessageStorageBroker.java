@@ -1,6 +1,7 @@
 package com.postoffice.storage.mongo;
 
 import com.postoffice.storage.MessageStorageBroker;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -47,7 +48,6 @@ public class MongoMessageStorageBroker implements MessageStorageBroker {
     public Flux<Message> findSectionRelativeLimit(Long messageIDFrom, Long messageIDTo, String domainID, String userA, boolean previous, int limit) {
         return findSectionRelativeLimit(messageIDFrom, messageIDTo, Optional.of(domainID), Optional.of(userA), Optional.empty(), false, limit);
     }
-
     @Override
     public Flux<Message> findSectionRelativeLimit(Long messageIDFrom, Long messageIDTo, String domainID, String userA, String userB, boolean previous, int limit) {
         return findSectionRelativeLimit(messageIDFrom, messageIDTo, Optional.of(domainID), Optional.of(userA), Optional.of(userB), previous, limit);
@@ -80,8 +80,10 @@ public class MongoMessageStorageBroker implements MessageStorageBroker {
                 condition.andOperator(criteriaAA);
             }
         }
-
         Query query = new Query(condition).limit(limit);
+        if(previous){
+            query.with(Sort.by(Sort.Direction.DESC,"messageID"));
+        }
         return template.find(query, Message.class);
     }
 

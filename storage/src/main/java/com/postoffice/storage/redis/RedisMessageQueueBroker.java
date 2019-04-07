@@ -26,8 +26,14 @@ public class RedisMessageQueueBroker implements MessageQueueBroker {
     }
 
     @Override
-    public Mono<Long> pushMessage(Message message){
-        return reactiveRedis.opsForList().leftPush(getKey(message.getDomainID(),message.getReceiver()), message);
+    public Mono<Message> pushMessage(Message message, boolean bothQueuesOfDeliverAndReceiver){
+        Mono<Message> messageMono = reactiveRedis.opsForList().leftPush(getKey(message.getDomainID(),message.getReceiver()), message)
+                .map(l->message);
+        if(bothQueuesOfDeliverAndReceiver){
+            return messageMono.flatMap(afterReceive -> reactiveRedis.opsForList().leftPush(getKey(afterReceive.getDomainID(),afterReceive.getDeliver()),afterReceive)
+            .map(l -> message));
+        }
+        return messageMono;
     }
 
     @Override

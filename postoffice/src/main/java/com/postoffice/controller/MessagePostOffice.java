@@ -3,6 +3,7 @@ package com.postoffice.controller;
 import com.postoffice.datamodel.AuthInfo;
 import com.postoffice.datamodel.ECommerceChartMessage;
 import com.postoffice.security.SecurityHandler;
+import com.postoffice.storage.mongo.Message;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.socket.WebSocketHandler;
@@ -41,7 +42,7 @@ public class MessagePostOffice {
      * @return Message ID of post office
      */
     @PostMapping("/send/{token}/{receiver}")
-    public Mono<Long> delivery(
+    public Mono<Message> delivery(
             @PathVariable String token,
             @PathVariable String receiver,
             @RequestBody String content

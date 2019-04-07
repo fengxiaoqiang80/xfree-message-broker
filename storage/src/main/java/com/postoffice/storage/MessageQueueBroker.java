@@ -10,9 +10,10 @@ public interface MessageQueueBroker {
     /**
      * Push a message
      * @param message message
+     * @param bothQueuesOfDeliverAndReceiver push message both queue of deliver and receiver
      * @return message count
      */
-    Mono<Long> pushMessage(Message message);
+    Mono<Message> pushMessage(Message message, boolean bothQueuesOfDeliverAndReceiver);
 
     /**
      * Pop message frmo queue
