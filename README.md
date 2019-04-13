@@ -1,7 +1,7 @@
 相关的技术：  
   .Spring WebFlux  
   .Reactive Program  
-  .Reactor Project3  
+  .Project Reactor 3  
   .WebSocket  
   .Server Send Event  
   .Reactive Mongodb  

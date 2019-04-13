@@ -1,7 +1,7 @@
 package com.postoffice.storage.redis;
 
 import com.postoffice.storage.MessageQueueBroker;
-import com.postoffice.storage.mongo.Message;
+import com.postoffice.storage.mongo.entity.MessageDBEntity;
 import org.springframework.data.redis.core.ReactiveRedisTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -10,45 +10,45 @@ import reactor.core.publisher.Mono;
 import java.time.Duration;
 
 @Service
-public class RedisMessageQueueBroker implements MessageQueueBroker {
+public class RedisQueueBroker implements MessageQueueBroker {
 
     public final static String CONCRETE_PREFIX_KEY = "MSG_PO_";
 
-    ReactiveRedisTemplate<String, Message> reactiveRedis;
-    /*BiFunction<String,Message,Mono<Long>> push;
-    Function<String,Mono<Message>> pop;
-    BiFunction<String,Duration,Mono<Message>> popDuration;*/
+    ReactiveRedisTemplate<String, MessageDBEntity> reactiveRedis;
+    /*BiFunction<String,MessageDBEntity,Mono<Long>> push;
+    Function<String,Mono<MessageDBEntity>> pop;
+    BiFunction<String,Duration,Mono<MessageDBEntity>> popDuration;*/
     private final int EARLIEST_INDEX;
 
-    public RedisMessageQueueBroker(ReactiveRedisTemplate<String, Message> reactiveRedis) {
+    public RedisQueueBroker(ReactiveRedisTemplate<String, MessageDBEntity> reactiveRedis) {
         this.reactiveRedis = reactiveRedis;
         EARLIEST_INDEX = -1;//与 push pop 的方向有关
     }
 
     @Override
-    public Mono<Message> pushMessage(Message message, boolean bothQueuesOfDeliverAndReceiver){
-        Mono<Message> messageMono = reactiveRedis.opsForList().leftPush(getKey(message.getDomainID(),message.getReceiver()), message)
-                .map(l->message);
+    public Mono<MessageDBEntity> pushMessage(MessageDBEntity messageDBEntity, boolean bothQueuesOfDeliverAndReceiver){
+        Mono<MessageDBEntity> messageMono = reactiveRedis.opsForList().leftPush(getKey(messageDBEntity.getDomainID(), messageDBEntity.getReceiver()), messageDBEntity)
+                .map(l-> messageDBEntity);
         if(bothQueuesOfDeliverAndReceiver){
             return messageMono.flatMap(afterReceive -> reactiveRedis.opsForList().leftPush(getKey(afterReceive.getDomainID(),afterReceive.getDeliver()),afterReceive)
-            .map(l -> message));
+            .map(l -> messageDBEntity));
         }
         return messageMono;
     }
 
     @Override
-    public Mono<Message> popMessage(String domainID,String user){
+    public Mono<MessageDBEntity> popMessage(String domainID, String user){
         return reactiveRedis.opsForList().rightPop(getKey(domainID,user));
     }
 
     @Override
-    public Flux<Message> popMessage(String domainID,String user,Duration duration){
+    public Flux<MessageDBEntity> popMessage(String domainID, String user, Duration duration){
         //return pop(getKey(domainID,user));
         return null;
     }
 
     @Override
-    public Mono<Message> earliestMessage(String domainID, String user) {
+    public Mono<MessageDBEntity> earliestMessage(String domainID, String user) {
         return reactiveRedis.opsForList().index(getKey(domainID,user),EARLIEST_INDEX);
     }
 

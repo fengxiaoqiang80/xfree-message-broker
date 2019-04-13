@@ -1,6 +1,6 @@
 package com.postoffice.storage;
 
-import com.postoffice.storage.mongo.Message;
+import com.postoffice.storage.mongo.entity.MessageDBEntity;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -8,12 +8,12 @@ import java.time.Duration;
 
 public interface MessageQueueBroker {
     /**
-     * Push a message
-     * @param message message
-     * @param bothQueuesOfDeliverAndReceiver push message both queue of deliver and receiver
-     * @return message count
+     * Push a messageDBEntity
+     * @param messageDBEntity messageDBEntity
+     * @param bothQueuesOfDeliverAndReceiver push messageDBEntity both queue of deliver and receiver
+     * @return messageDBEntity count
      */
-    Mono<Message> pushMessage(Message message, boolean bothQueuesOfDeliverAndReceiver);
+    Mono<MessageDBEntity> pushMessage(MessageDBEntity messageDBEntity, boolean bothQueuesOfDeliverAndReceiver);
 
     /**
      * Pop message frmo queue
@@ -21,7 +21,7 @@ public interface MessageQueueBroker {
      * @param user user
      * @return message mono
      */
-    Mono<Message> popMessage(String domainID, String user);
+    Mono<MessageDBEntity> popMessage(String domainID, String user);
 
     /**
      * Pop message from queue with limit time
@@ -30,12 +30,12 @@ public interface MessageQueueBroker {
      * @param duration duration
      * @return message flux
      */
-    Flux<Message> popMessage(String domainID, String user, Duration duration);
+    Flux<MessageDBEntity> popMessage(String domainID, String user, Duration duration);
     /**
      * get earliest message in the queue
      * @param domainID domainID
      * @param user user
      * @return message mono
      */
-    Mono<Message> earliestMessage(String domainID, String user);
+    Mono<MessageDBEntity> earliestMessage(String domainID, String user);
 }

@@ -22,18 +22,21 @@ public class ThirdPartTokenHandler implements SecurityHandler {
     private final String serverBaseURL;
     private final String getUserByTokenURL;
     private final String validateTokenURL;
+    private final String getPersonURL;
 
     public ThirdPartTokenHandler(
             @Value("${security.auth.serverBaseURL}") String serverBaseURL,
             @Value("${security.auth.validateTokenURL}") String validateTokenURL,
-            @Value("${security.auth.getUserByTokenURL}") String getUserByTokenURL) {
+            @Value("${security.auth.getUserByTokenURL}") String getUserByTokenURL,
+            @Value("${security.auth.getPersonURL}") String getPersonURL) {
         this.serverBaseURL = serverBaseURL;
         this.validateTokenURL = validateTokenURL;
         this.getUserByTokenURL = getUserByTokenURL;
+        this.getPersonURL = getPersonURL;
     }
 
-    public Mono<AuthInfo> token(String token) {
-        //logger.error("Who call me...");
+    @Override
+    public Mono<AuthInfo> validateToken(String token) {
         return Mono.from(getUserInfo(token))
                 .log(logger)
                 .doOnError(t -> logger.error("Getting user information by token error", t))
@@ -47,25 +50,37 @@ public class ThirdPartTokenHandler implements SecurityHandler {
                 });
     }
 
-    /*public Mono<SecurityProperties.User> user(String userID) {
-        return Mono.empty();
-    }*/
+    @Override
+    public Mono<User> findPersonInfo(String token, String personID) {
+        return remoteGet(getPersonURL + "/" + personID, token)
+                .bodyToMono(ThirdPersonInfo.class)
+                .doOnNext(person -> {
+                    if (!person.isSuccess()) {
+                        logger.warn(
+                                "Getting person info from auth server unsuccessfully,personID:{},remote info:{}",
+                                personID,
+                                JSON.toJSONString(person));
+                    }
+                })
+                .filter(person -> person.isSuccess())
+                .map(person ->
+                        User.builder()
+                                .headImgUrl(person.data.headImgUrl)
+                                .nickname(person.data.nickname)
+                                .mobile(person.data.mobile)
+                                .build())
+                .doOnError(t -> logger.error("Getting remote person information error", t));
+    }
 
-
-    public Mono<ThirdPartUser> getUserInfo(String token) {
+    private Mono<ThirdPartUser> getUserInfo(String token) {
         return remoteGet(getUserByTokenURL, token)
                 .bodyToMono(ThirdPartUserInfo.class)
-                /*.flatMap(c->
-                        c.isSuccess() ?
-                                Mono.just(c):
-                                Mono.error(new RuntimeException("Getting remote user unsuccessfully,the content is "+ JSON.toJSONString(c))))
-                */
-                .map(c->c.getData())
+                .map(c -> c.getData())
                 .doOnError(t -> logger.error("Getting remote user information error", t));
     }
 
 
-    public WebClient.ResponseSpec remoteGet(String url, String token) {
+    private WebClient.ResponseSpec remoteGet(String url, String token) {
 
         return WebClient.create(url)
                 .method(HttpMethod.GET)
@@ -81,16 +96,26 @@ public class ThirdPartTokenHandler implements SecurityHandler {
                 );
     }
 
+
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
     @ToString
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-    public static class ThirdPartUserInfo {
+    public static class ThirdRespBase {
         private String bizCode;
         private String bizMessage;
         private boolean success;
+
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    //@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    public static class ThirdPartUserInfo extends ThirdRespBase {
         @EqualsAndHashCode.Include
         private ThirdPartUser data;
     }
@@ -100,7 +125,7 @@ public class ThirdPartTokenHandler implements SecurityHandler {
     @AllArgsConstructor
     @NoArgsConstructor
     @ToString
-    @EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    //@EqualsAndHashCode(onlyExplicitlyIncluded = true)
     public static class ThirdPartUser {
         private String identity;
         private String mobile;
@@ -108,5 +133,31 @@ public class ThirdPartTokenHandler implements SecurityHandler {
         private String personnelId;
         private String shopId;
     }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    //@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+    public static class ThirdPersonInfo extends ThirdRespBase {
+        private ThirdPerson data;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @ToString
+    public static class ThirdPerson {
+        private long id;
+        private String appId;
+        private String openid;
+        private String mobile;
+        private String nickname;
+        private String headImgUrl;
+        private boolean deleteFlag;
+    }
+
 
 }

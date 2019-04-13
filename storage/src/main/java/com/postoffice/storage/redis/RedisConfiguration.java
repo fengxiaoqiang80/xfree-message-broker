@@ -1,6 +1,6 @@
 package com.postoffice.storage.redis;
 
-import com.postoffice.storage.mongo.Message;
+import com.postoffice.storage.mongo.entity.MessageDBEntity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -14,14 +14,14 @@ public class RedisConfiguration {
 
     //https://www.programcreek.com/java-api-examples/index.php?api=org.springframework.data.redis.core.ReactiveRedisTemplate
     @Bean
-    public ReactiveRedisTemplate<String, Message> reactiveJsonPostRedisTemplate(
+    public ReactiveRedisTemplate<String, MessageDBEntity> reactiveJsonPostRedisTemplate(
             ReactiveRedisConnectionFactory connectionFactory) {
 
         StringRedisSerializer keySerializer = new StringRedisSerializer();
-        Jackson2JsonRedisSerializer<Message> valueSerializer = new Jackson2JsonRedisSerializer<>(Message.class);
+        Jackson2JsonRedisSerializer<MessageDBEntity> valueSerializer = new Jackson2JsonRedisSerializer<>(MessageDBEntity.class);
 
-        RedisSerializationContext<String, Message> serializationContext = RedisSerializationContext
-                .<String, Message>newSerializationContext(new StringRedisSerializer())
+        RedisSerializationContext<String, MessageDBEntity> serializationContext = RedisSerializationContext
+                .<String, MessageDBEntity>newSerializationContext(new StringRedisSerializer())
                 .key(keySerializer)
                 .hashKey(keySerializer)
                 .value(valueSerializer)

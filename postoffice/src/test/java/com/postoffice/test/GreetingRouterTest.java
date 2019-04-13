@@ -1,6 +1,6 @@
 package com.postoffice.test;
 
-import com.postoffice.controller.MessagePostOfficeService;
+import com.postoffice.controller.MessageService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import java.time.Duration;
 
 public class GreetingRouterTest {
     @Autowired
-    MessagePostOfficeService postOfficeService;
+    MessageService postOfficeService;
 
 
     @Test

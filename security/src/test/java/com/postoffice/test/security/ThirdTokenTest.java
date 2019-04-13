@@ -20,7 +20,14 @@ public class ThirdTokenTest {
 
     @Test
     public void testSecurityHandle(){
-        securityHandler.token("1bed312b-0833-40e4-82e3-7693e738876b")
+        securityHandler.validateToken(TestThirdToken.token)
+                .doOnNext(System.out::println)
+                .block(Duration.ofSeconds(5));
+    }
+
+    @Test
+    public void testFindPersonInfo(){
+        securityHandler.findPersonInfo(TestThirdToken.token,"2")
                 .doOnNext(System.out::println)
                 .block(Duration.ofSeconds(5));
     }

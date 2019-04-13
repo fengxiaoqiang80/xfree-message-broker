@@ -4,5 +4,5 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication(scanBasePackages="com.postoffice")
 public class TestConfiguration {
-    public static String token = "cb75d0ea-be98-425d-8d12-dec2ced7fe39";
+    public static String token = "13c0de32-f2d6-422d-b38a-2ff1eab1476a";
 }

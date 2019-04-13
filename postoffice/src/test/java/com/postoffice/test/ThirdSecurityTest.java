@@ -24,7 +24,7 @@ public class ThirdSecurityTest {
 
     @Test
     public void getUser(){
-        Mono<AuthInfo> authInfoMono = securityHandler.token("1bed312b-0833-40e4-82e3-7693e738876b");
+        Mono<AuthInfo> authInfoMono = securityHandler.validateToken("1bed312b-0833-40e4-82e3-7693e738876b");
         authInfoMono.doOnNext(System.out::println)
                 .block(Duration.ofSeconds(10));
     }

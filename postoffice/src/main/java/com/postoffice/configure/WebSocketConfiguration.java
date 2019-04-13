@@ -1,6 +1,6 @@
 package com.postoffice.configure;
 
-import com.postoffice.controller.MessagePostOffice;
+import com.postoffice.controller.MessageCtrl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.ReactiveRedisConnectionFactory;
@@ -16,9 +16,9 @@ import java.util.Collections;
 public class WebSocketConfiguration {
 
     @Bean
-    public HandlerMapping handlerMapping(MessagePostOffice messagePostOffice) {
+    public HandlerMapping handlerMapping(MessageCtrl messagePostOffice) {
         SimpleUrlHandlerMapping mapping = new SimpleUrlHandlerMapping();
-        mapping.setUrlMap(Collections.singletonMap(MessagePostOffice.WS_URL_PATTERN_BROKER, messagePostOffice.webSocketHandler()));
+        mapping.setUrlMap(Collections.singletonMap(MessageCtrl.WS_URL_PATTERN_BROKER, messagePostOffice.webSocketHandler()));
         mapping.setOrder(1);
         return mapping;
     }

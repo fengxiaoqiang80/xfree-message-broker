@@ -18,28 +18,8 @@ public class GlobalConfig implements WebFluxConfigurer {
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);
-
-        //registry.
-
-        // Add more mappings...
     }
 
 
 
-    /*@Bean
-    CorsWebFilter corsFilter() {
-
-        CorsConfiguration config = new CorsConfiguration();
-        // Possibly...
-        // config.applyPermitDefaultValues()
-        config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("*");
-        config.addAllowedMethod("*");
-
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-
-        return new CorsWebFilter(source);
-    }*/
 }

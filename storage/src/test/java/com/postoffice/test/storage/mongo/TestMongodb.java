@@ -3,9 +3,9 @@ package com.postoffice.test.storage.mongo;
 
 import com.alibaba.fastjson.JSON;
 import com.postoffice.storage.mongo.IDGenerator;
-import com.postoffice.storage.mongo.IDSequence;
-import com.postoffice.storage.mongo.Message;
-import com.postoffice.storage.mongo.MessageRepository;
+import com.postoffice.storage.mongo.entity.IDSequenceDBEntity;
+import com.postoffice.storage.mongo.entity.MessageDBEntity;
+import com.postoffice.storage.mongo.dao.MessageRepository;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class TestMongodb {
         Assert.assertNotNull(template);
         Assert.assertNotNull(messageRepository);
 
-        Message m = new Message();
+        MessageDBEntity m = new MessageDBEntity();
         m.setContent("my first content");
         m.setGenerateTime(new Date());
         m.setDeliveryTime(m.getGenerateTime());
@@ -54,20 +54,17 @@ public class TestMongodb {
 
     @Autowired
     IDGenerator idGenerator;
-
     @Test
     @Ignore
-    public void generateASequence() throws Exception{
-        idGenerator.generateSEQ("message")
+    public void generateASequence(){
+        idGenerator.generateSEQ(MessageDBEntity.ID_MESSAGE_SEQ_NAME)
                 .doOnError(System.err::println)
                 .block(Duration.ofSeconds(5));
     }
 
     @Test
-    @Ignore
-    public void testSequence() throws Exception{
-
-        Mono<IDSequence> sequenceMono = idGenerator.getNextSequenceMono("message");
+    public void testSequence() {
+        Mono<IDSequenceDBEntity> sequenceMono = idGenerator.getNextSequenceMono(MessageDBEntity.ID_MESSAGE_SEQ_NAME);
         sequenceMono
                 .map(JSON::toJSONString)
                 .doOnNext(System.out::println)

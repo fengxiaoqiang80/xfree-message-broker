@@ -5,3 +5,4 @@ security:
     serverBaseURL: http://127.0.0.1:8080
     getUserByTokenURL: ${security.auth.serverBaseURL}/microprogram/getloginOnUser
     validateTokenURL: ${security.auth.serverBaseURL}/microprogram/token/validate
+    getPersonURL: ${security.auth.serverBaseURL}/microprogram/personnel
