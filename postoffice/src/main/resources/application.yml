@@ -1,12 +1,6 @@
 
 
 spring:
-
-  # redis:
-    # host: 127.0.0.1
-    # password:
-    # port: 6379
-
   data:
     mongodb:
       host: 127.0.0.1
@@ -19,16 +13,22 @@ spring:
       # password:
       port: 6379
 
-      redis:
-        password: myredis2018
-        host: 127.0.0.1
+  thymeleaf:
+    prefix: file:///Users/fengxiaoqiang/Documents/ws_newsoft/xfree-message-broker/postoffice/src/main/resources/templates/
+    cache: false
+
 
 security:
   auth:
     serverBaseURL: http://127.0.0.1:8080
     getUserByTokenURL: ${security.auth.serverBaseURL}/microprogram/getloginOnUser
     validateTokenURL: ${security.auth.serverBaseURL}/microprogram/token/validate
-
+    getPersonURL: ${security.auth.serverBaseURL}/microprogram/personnel
 
 server:
   port: 9090
+
+logging:
+  level:
+    root: debug
+
